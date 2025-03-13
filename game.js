@@ -40,169 +40,377 @@ signInAnonymously(auth)
 // 4. Define PrimeFactorGame Class
 class PrimeFactorGame {
   constructor() {
-    // Initialize state
-    this.score = 0;
-    this.mistakeCount = 0;
-    this.totalPenalty = 0;
-    this.timerDuration = 120; // 2 minutes in seconds
-    this.startTime = null;
-    this.timerInterval = null;
-    this.gameRunning = false;
-    this.currentNumber = 0;
-    this.username = "";
-    // Example prime arrays – adjust as needed
-    this.easyPrimes = [2, 3, 5, 7, 11];
-    this.hardPrimes = [13, 17, 19, 23];
+      this.easyPrimes = [2, 3, 5, 7, 11];
+      this.hardPrimes = [13, 17, 19, 23];
+      this.usedNumbers = new Set();
+      this.score = 0;
+      this.combo = 0;
+      this.perfectStreak = 0;
+      this.correctList = [];
+      this.wrongList = [];
+      this.mistakeMade = false;
+      this.mistakeCount = 0;
+      this.questionNumber = 0;
+      this.timeLeft = 120.00;
+      this.gameRunning = false;
+      this.username = "";
+      this.difficultyThresholds = [35000, 90000, 200000];
+      // ... (any additional properties)
   }
-
-  startGame(username) {
-    this.username = username;
-    console.log(`Starting game for ${username}`);
-    // Reset game state
-    this.score = 0;
-    this.mistakeCount = 0;
-    this.totalPenalty = 0;
-    this.gameRunning = true;
-    // Hide the start screen and show the game screen
-    document.getElementById("start-screen").style.display = "none";
-    document.getElementById("game-screen").style.display = "block";
-    // Begin with a countdown
-    this.startCountdown();
-  }
-
-  startCountdown() {
-    let count = 3;
-    const countdownEl = document.getElementById("countdown");
-    countdownEl.innerText = count;
-    const countdownInterval = setInterval(() => {
-      count--;
-      if (count > 0) {
-        countdownEl.innerText = count;
-      } else {
-        clearInterval(countdownInterval);
-        countdownEl.innerText = ""; // clear countdown display
-        // Now start the timer and game buttons
-        this.startTimer();
-        this.createButtons();
-        // For demonstration, set a starting composite number
-        this.currentNumber = 100; // Replace with your actual logic
-        document.getElementById("number-display").innerText = `Factorize: ${this.currentNumber}`;
+  
+  bindEvents() {
+      const buttonsEl = document.getElementById("buttons");
+      if (!buttonsEl) {
+          console.error("Element with ID 'buttons' not found!");
+          return;
       }
-    }, 1000);
+      buttonsEl.addEventListener("click", (e) => {
+          if (e.target && e.target.classList.contains("prime-btn")) {
+              const guessedFactor = parseInt(e.target.textContent, 10);
+              this.handleGuess(guessedFactor, e.target);
+          }
+      });
   }
-
+  
+  startGame() {
+      // Set race duration
+      this.raceDuration = 120;
+      // Reset penalty and record username from input
+      this.totalPenalty = 0;
+      this.username = document.getElementById("username-input").value || "Player";
+      document.getElementById("username-display").innerText = `Player: ${this.username}`;
+      // Hide start screen, show game screen
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("game-screen").style.display = "block";
+      
+      // Start countdown on number-display
+      let countdown = 3;
+      document.getElementById("number-display").innerText = `Starting in ${countdown}...`;
+  
+      let countdownInterval = setInterval(() => {
+          countdown--;
+          document.getElementById("number-display").innerText = `Starting in ${countdown}...`;
+  
+          if (countdown <= 0) {
+              clearInterval(countdownInterval);
+              console.log("Starting game...");
+              // Now start the actual game (timer starts after countdown)
+              this.beginGame();
+          }
+      }, 1000);
+  }
+  
+  // (Not using startCountdown() here since startGame() handles countdown.)
+  
   startTimer() {
-    // Record the real start time (so we can compute elapsed time regardless of throttling)
-    this.startTime = Date.now();
-    // Update timer every 100ms
-    this.timerInterval = setInterval(() => this.updateTimer(), 100);
+      // Record the real start time at the moment the game begins
+      this.startTime = Date.now();
+      // Update the timer display every 100ms
+      this.timerInterval = setInterval(() => this.updateTimer(), 100);
   }
-
+  
   updateTimer() {
-    const elapsed = (Date.now() - this.startTime) / 1000; // in seconds
-    const remaining = Math.max(0, this.timerDuration - elapsed - this.totalPenalty);
-    document.getElementById("timer-display").innerText = `Time Left: ${remaining.toFixed(2)}s`;
-    if (remaining <= 0) {
-      clearInterval(this.timerInterval);
-      this.endGame();
-    }
+      const elapsed = (Date.now() - this.startTime) / 1000;
+      const remaining = Math.max(0, this.timerDuration - elapsed - this.totalPenalty);
+      const timerDisplay = document.getElementById("timer-display");
+      if (timerDisplay) {
+          timerDisplay.innerText = `Time Left: ${remaining.toFixed(2)}s`;
+      }
+      if (remaining <= 0) {
+          clearInterval(this.timerInterval);
+          this.endGame();
+      }
   }
-
-  updateScore(prime) {
-    // Calculate a score increment based on the guessed prime
-    const baseScore = this.getBaseScore(prime);
-    this.score += baseScore;
-    // Update the score display
-    const scoreDisplay = document.getElementById("score-display");
-    if (scoreDisplay) {
-      scoreDisplay.innerText = this.score.toFixed(2);
-    }
-  }
-
-  getBaseScore(prime) {
-    // Example scoring logic – adjust as needed
-    return (prime <= 10) ? 100 : 200;
-  }
-
-  handleGuess(prime, button) {
-    if (!this.gameRunning) return;
-    // If the prime is not a factor
-    if (this.currentNumber % prime !== 0) {
-      button.classList.add("wrong");
-      setTimeout(() => button.classList.remove("wrong"), 300);
-      this.applyPenalty();
-      return;
-    }
-    // Correct guess – highlight and update
-    button.classList.add("correct");
-    setTimeout(() => button.classList.remove("correct"), 300);
-    this.updateScore(prime);
-    this.currentNumber /= prime;
-    document.getElementById("number-display").innerText = `Factorize: ${this.currentNumber}`;
-    if (this.currentNumber === 1) {
-      // When fully factorized, start a new round (or end round)
+  
+  beginGame() {
+      console.log("Game has started!");
+      this.gameRunning = true;
+      // Set the start time now so the timer starts after the countdown
+      this.startTime = Date.now();
+      // Start the timer for the 2-minute race
+      this.startTimer();
+      // Create the buttons and start the first round
+      this.createButtons();
       this.newRound();
-    }
   }
-
+  
   createButtons() {
-    const buttonsContainer = document.getElementById("buttons");
-    buttonsContainer.innerHTML = "";
-    // Create buttons for all available primes using arrow functions to preserve "this"
-    [...this.easyPrimes, ...this.hardPrimes].forEach(prime => {
-      const button = document.createElement("button");
-      button.classList.add("prime-btn");
-      button.textContent = prime;
-      button.addEventListener("click", () => this.handleGuess(prime, button));
-      buttonsContainer.appendChild(button);
-    });
+      const buttonsContainer = document.getElementById("buttons");
+      buttonsContainer.innerHTML = "";
+      [...this.easyPrimes, ...this.hardPrimes].forEach(prime => {
+          const button = document.createElement("button");
+          button.classList.add("prime-btn");
+          button.textContent = prime;
+          // Use arrow function to preserve the context
+          button.addEventListener("click", () => {
+              this.handleGuess(prime, button);
+          });
+          buttonsContainer.appendChild(button);
+      });
   }
-
-  applyPenalty() {
-    this.mistakeCount++;
-    const penalty = this.fibonacci(this.mistakeCount) * 0.1;
-    this.totalPenalty += penalty;
-    console.log("Penalty applied. Total penalty:", this.totalPenalty);
-    // Update the timer display immediately after applying the penalty
-    this.updateTimer();
+  
+  setQuestion() {
+      let number;
+      do {
+          number = this.generateCompositeNumber();
+      } while (this.usedNumbers.has(number));
+  
+      this.usedNumbers.add(number);
+      return number;
   }
-
-  fibonacci(n) {
-    if (n <= 1) return n;
-    let a = 0, b = 1;
-    for (let i = 2; i <= n; i++) {
-      let temp = a + b;
-      a = b;
-      b = temp;
-    }
-    return b;
+  
+  generateCompositeNumber() {
+      let score = this.score;
+      let numEasy, numHard;
+      if (score >= 200000) {
+          numEasy = Math.floor(Math.random() * 6) + 2;
+          numHard = Math.floor(Math.random() * 4) + 3;
+      } else if (score >= 90000) {
+          numEasy = Math.floor(Math.random() * 5) + 2;
+          numHard = Math.floor(Math.random() * 3) + 2;
+      } else if (score >= 35000) {
+          numEasy = Math.floor(Math.random() * 4) + 2;
+          numHard = 1;
+      } else {
+          numEasy = Math.floor(Math.random() * 3) + 2;
+          numHard = 0;
+      }
+      let factors = [];
+      for (let i = 0; i < numEasy; i++) {
+          factors.push(this.easyPrimes[Math.floor(Math.random() * this.easyPrimes.length)]);
+      }
+      for (let i = 0; i < numHard; i++) {
+          factors.push(this.hardPrimes[Math.floor(Math.random() * this.hardPrimes.length)]);
+      }
+      return factors.reduce((a, b) => a * b, 1);
   }
-
+  
+  handleGuess(prime, button) {
+      if (!this.gameRunning) return;
+    
+      if (this.currentNumber % prime !== 0) {
+          // Wrong guess: highlight red.
+          button.classList.add("wrong");
+          setTimeout(() => button.classList.remove("wrong"), 300);
+          this.mistakeMade = true;
+          this.combo = 0; // Reset combo.
+          this.perfectStreak = 0;
+          this.applyPenalty();
+          return;
+      }
+    
+      // Correct guess: highlight green.
+      button.classList.add("correct");
+      setTimeout(() => button.classList.remove("correct"), 300);
+    
+      // Increase score for this guess.
+      this.updateScore(prime);
+      this.currentNumber /= prime;
+      document.getElementById("number-display").innerText = `Factorize: ${this.currentNumber}`;
+    
+      if (this.currentNumber === 1) {
+          this.completeFactorization();
+      }
+  }
+  
   newRound() {
-    // Placeholder logic for a new round – update currentNumber accordingly
-    this.currentNumber = 100; // Replace with your own logic
-    document.getElementById("number-display").innerText = `Factorize: ${this.currentNumber}`;
+      this.mistakeMade = false;
+      this.currentNumber = this.setQuestion();
+      this.originalNumber = this.currentNumber;
+      console.log("New number generated:", this.currentNumber);
+      document.getElementById("number-display").innerText = `Factorize: ${this.currentNumber}`;
   }
-
+  
+  updateScore(prime) {
+      // Declare baseScore first
+      const baseScore = this.getBaseScore(prime);
+      // Increase combo counter.
+      this.combo++;
+      let comboBonus = 50 * this.combo;
+      let pointsEarned = baseScore + comboBonus;
+    
+      let currentScore = this.score;
+      let targetScore = this.score + pointsEarned;
+      let steps = 20;
+      let stepValue = (targetScore - currentScore) / steps;
+      const actionText = document.getElementById("action-text");
+      const scoreDisplay = document.getElementById("score-display");
+    
+      actionText.innerText = `+${pointsEarned.toFixed(2)}`;
+      actionText.style.display = "block";
+      actionText.classList.remove("action-popup");
+      void actionText.offsetWidth;
+      actionText.classList.add("action-popup");
+    
+      let step = 0;
+      let interval = setInterval(() => {
+          if (step < steps) {
+              currentScore += stepValue;
+              this.score = currentScore;
+              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+              step++;
+          } else {
+              clearInterval(interval);
+              this.score = targetScore;
+              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+          }
+      }, 50);
+      this.score += baseScore;
+      if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+  }
+  
+  getBaseScore(prime) {
+      if ([2, 3, 5, 7].includes(prime)) return 100;
+      if ([11, 13, 17].includes(prime)) return 300;
+      return 500;
+  }
+  
+  // Applies a time penalty for a wrong guess.
+  applyPenalty() {
+      this.mistakeCount++;
+      const penalty = this.fibonacci(this.mistakeCount) * 0.1;
+      this.totalPenalty += penalty;
+      console.log("Penalty applied. Total penalty: ", this.totalPenalty);
+      this.updateTimer();
+  }
+  
+  fibonacci(n) {
+      if (n <= 1) return n;
+      let a = 0, b = 1;
+      for (let i = 2; i <= n; i++) {
+          let temp = a + b;
+          a = b;
+          b = temp;
+      }
+      return b;
+  }
+  
+  // Called when the current question is fully factorized.
+  completeFactorization() {
+      let m = this.questionNumber;
+      let clearBonus = 0;
+      if (this.mistakeMade) {
+          clearBonus = 1000 * m;
+          this.perfectStreak = 0;
+      } else {
+          clearBonus = 3500 * Math.pow(1.05, m);
+          if (this.perfectStreak > 0) {
+              clearBonus += 3500 * Math.pow(1.618, this.perfectStreak / 6);
+          }
+          this.perfectStreak++;
+      }
+    
+      // Animate clear bonus addition.
+      this.animateClearBonus(clearBonus);
+    
+      // Record the initial number for end-of-game reporting.
+      if (this.mistakeMade) {
+          this.wrongList.push({ number: this.originalNumber, factors: this.getFactorization(this.originalNumber) });
+      } else {
+          this.correctList.push({ number: this.originalNumber, factors: this.getFactorization(this.originalNumber) });
+      }
+    
+      // Start the next round.
+      this.newRound();
+  }
+  
+  // Animates the addition of a bonus (clear bonus) to the score.
+  animateClearBonus(bonus) {
+      let currentScore = this.score;
+      let targetScore = this.score + bonus;
+      let steps = 20;
+      let stepValue = bonus / steps;
+      const scoreDisplay = document.getElementById("score-display");
+      const actionText = document.getElementById("action-text");
+    
+      actionText.innerText = `+${bonus.toFixed(2)}`;
+      actionText.style.display = "block";
+      actionText.classList.remove("action-popup");
+      void actionText.offsetWidth;
+      actionText.classList.add("action-popup");
+    
+      let step = 0;
+      let interval = setInterval(() => {
+          if (step < steps) {
+              currentScore += stepValue;
+              this.score = currentScore;
+              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+              step++;
+          } else {
+              clearInterval(interval);
+              this.score = targetScore;
+              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+          }
+      }, 50);
+  }
+  
+  updateTimer() {
+      // Calculate elapsed time in seconds using the system clock
+      const elapsed = (Date.now() - this.startTime) / 1000;
+      // Adjust for any penalty if necessary
+      const adjustedElapsed = elapsed + this.totalPenalty;
+      // Calculate remaining time
+      const remaining = Math.max(0, this.raceDuration - adjustedElapsed);
+    
+      // Update the display
+      document.getElementById("timer-display").innerText = `Time Left: ${remaining.toFixed(2)}s`;
+  }
+  
+  getFactorization(number) {
+      let n = number;
+      let factors = {};
+      for (let prime of [...this.easyPrimes, ...this.hardPrimes]) {
+          while (n % prime === 0) {
+              factors[prime] = (factors[prime] || 0) + 1;
+              n /= prime;
+          }
+      }
+      return Object.entries(factors)
+          .map(([base, exp]) => exp > 1 ? `${base}^${exp}` : base)
+          .join(" × ");
+  }
+  
   endGame() {
-    this.gameRunning = false;
-    document.getElementById("game-screen").style.display = "none";
-    document.getElementById("end-screen").style.display = "block";
-    document.getElementById("final-score").innerText = `Final Score: ${this.score.toFixed(2)}`;
-  }
+      // Ensure elements exist before modifying them
+      const endScreen = document.getElementById("end-screen");
+      const finalScoreElement = document.getElementById("final-score");
+      const correctListElement = document.getElementById("correct-list");
+      const wrongListElement = document.getElementById("wrong-list");
+  
+      if (!endScreen || !finalScoreElement || !correctListElement || !wrongListElement) {
+          console.error("End screen elements not found!");
+          return;
+      }
+      document.getElementById("game-screen").style.display = "none";
+      endScreen.style.display = "block";
+  
+      finalScoreElement.innerText = `Final Score: ${this.score.toFixed(1)}`;
+  
+      correctListElement.innerHTML = this.correctList.length > 0 
+          ? this.correctList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
+          : '<li>None</li>';
+  
+      wrongListElement.innerHTML = this.wrongList.length > 0 
+          ? this.wrongList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
+          : '<li>None</li>';
+      gameOver();
+      return;
+  }  
 }
+\
 
-// When the DOM is ready, create the game instance and bind the start button
+// 6. Initialize Game Object
 document.addEventListener("DOMContentLoaded", () => {
   const game = new PrimeFactorGame();
-  window.game = game; // Expose globally if needed
+  window.game = game;  // Expose game globally if needed
 
-  const startBtn = document.getElementById("start-btn");
-  if (!startBtn) {
+  // Bind the start button click event
+  const startGameBtn = document.getElementById("start-btn");
+  if (!startGameBtn) {
     console.error("Start game button not found!");
     return;
   }
-  startBtn.addEventListener("click", () => {
+  startGameBtn.addEventListener("click", () => {
     const usernameInput = document.getElementById("username-input");
     if (!usernameInput) {
       console.error("Username input element not found!");
