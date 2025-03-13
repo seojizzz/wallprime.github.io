@@ -338,7 +338,7 @@ class PrimeFactorGame {
 document.addEventListener("DOMContentLoaded", () => {
   const game = new PrimeFactorGame();
   // Bind the start button directly:
-  const startGameBtn = document.getElementById("start-game-btn");
+  const startGameBtn = document.getElementById("start-btn");
   if (startGameBtn) {
     startGameBtn.addEventListener("click", () => {
       game.startGame();
