@@ -381,33 +381,48 @@ class PrimeFactorGame {
   }
   
   endGame() {
-      // Ensure end-screen elements exist
-      const endScreen = document.getElementById("end-screen");
-      const finalScoreElement = document.getElementById("final-score");
-      const correctListElement = document.getElementById("correct-list");
-      const wrongListElement = document.getElementById("wrong-list");
-  
-      if (!endScreen || !finalScoreElement || !correctListElement || !wrongListElement) {
-          console.error("End screen elements not found!");
-          return;
-      }
-      // Hide the entire game screen
-      document.getElementById("game-screen").style.display = "none";
-      // Show the end screen
-      endScreen.style.display = "block";
-  
-      finalScoreElement.innerText = `Final Score: ${this.score.toFixed(1)}`;
-  
-      correctListElement.innerHTML = this.correctList.length > 0 
-          ? this.correctList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
-          : '<li>None</li>';
-  
-      wrongListElement.innerHTML = this.wrongList.length > 0 
-          ? this.wrongList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
-          : '<li>None</li>';
-  
-      // Removed gameOver() call to ensure endGame completes
-  }  
+    // Submit the score to Firebase Firestore before finishing the game.
+    this.submitScore();
+
+    // Hide the game screen and show the end screen.
+    const endScreen = document.getElementById("end-screen");
+    const finalScoreElement = document.getElementById("final-score");
+    const correctListElement = document.getElementById("correct-list");
+    const wrongListElement = document.getElementById("wrong-list");
+
+    if (!endScreen || !finalScoreElement || !correctListElement || !wrongListElement) {
+        console.error("End screen elements not found!");
+        return;
+    }
+
+    document.getElementById("game-screen").style.display = "none";
+    endScreen.style.display = "block";
+
+    finalScoreElement.innerText = `Final Score: ${this.score.toFixed(1)}`;
+
+    correctListElement.innerHTML = this.correctList.length > 0 
+        ? this.correctList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
+        : '<li>None</li>';
+
+    wrongListElement.innerHTML = this.wrongList.length > 0 
+        ? this.wrongList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
+        : '<li>None</li>';
+}
+
+// New method to submit the score.
+async submitScore() {
+    try {
+        // Use the username as the document ID so that each player is registered only once.
+        await setDoc(doc(this.db, "leaderboard", this.username), {
+            username: this.username,
+            score: this.score,
+            submittedAt: serverTimestamp()
+        });
+        console.log("Score submitted successfully to Firebase.");
+    } catch (error) {
+        console.error("Error submitting score: ", error);
+    }
+}
 }
 
 // When the DOM is ready, create the game instance and bind the start button
@@ -477,16 +492,3 @@ async function loadLeaderboard() {
         console.error("Error loading leaderboard:", error);
     }
 }
-async function submitScore() {
-        try {
-            // Use the username as the document ID so that each player is registered only once.
-            await setDoc(doc(this.db, "leaderboard", this.username), {
-                username: this.username,
-                score: this.score,
-                submittedAt: serverTimestamp()
-            });
-            console.log("Score submitted successfully to Firebase.");
-        } catch (error) {
-            console.error("Error submitting score: ", error);
-        }
-    }
