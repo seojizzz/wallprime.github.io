@@ -357,7 +357,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.game = game;  // Now you can reference window.game from anywhere
 
   // Find the start button by its ID
-  const startGameBtn = document.getElementById("start-game-btn");
+  const startGameBtn = document.getElementById("start-btn");
   if (!startGameBtn) {
     console.error("Start game button not found!");
     return;
