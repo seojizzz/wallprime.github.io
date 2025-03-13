@@ -2,11 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SJI WallPrime Leaderboard</title>
+<title>Leaderboard</title>
 <link rel="stylesheet" href="leaderboardstyles.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    /* (Optional inline styles can go here if needed) */
+</style>
 </head>
 <body>
-<h1>WallPrime Leaderboard</h1>
+<h1>Leaderboard</h1>
 
 <!-- Manual Refresh Button -->
 <button id="refresh-leaderboard">Refresh Leaderboard</button>
@@ -24,7 +28,7 @@
 </table>
 
 <script type="module">
-    // Import Firebase modules and initialize Firestore as before
+    // Import Firebase modules and initialize Firestore
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -41,25 +45,39 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Function to fetch the top 50 leaderboard entries
+    // Fetch the top 50 leaderboard entries (even if fewer than 40 exist)
     async function fetchLeaderboard() {
-    const leaderboardRef = collection(db, "leaderboard");
-    const leaderboardQuery = query(leaderboardRef, orderBy("score", "desc"), limit(50));
-    const querySnapshot = await getDocs(leaderboardQuery);
-    const leaderboardData = [];
-    querySnapshot.forEach(doc => {
+    try {
+        const leaderboardRef = collection(db, "leaderboard");
+        const leaderboardQuery = query(leaderboardRef, orderBy("score", "desc"), limit(50));
+        const querySnapshot = await getDocs(leaderboardQuery);
+        const leaderboardData = [];
+        querySnapshot.forEach(doc => {
         leaderboardData.push(doc.data());
-    });
-    return leaderboardData;
+        });
+        return leaderboardData;
+    } catch (error) {
+        console.error("Error fetching leaderboard data:", error);
+        return [];
+    }
     }
 
-    // Function to update the leaderboard table
+    // Update the leaderboard table with fetched data
     async function updateLeaderboardTable() {
     const data = await fetchLeaderboard();
     const tableBody = document.querySelector("#leaderboard-table tbody");
     tableBody.innerHTML = ""; // Clear previous rows
 
-    data.forEach((entry, index) => {
+    if (data.length === 0) {
+        // Show a placeholder row if no data is available
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 2;
+        cell.textContent = "No leaderboard entries available.";
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+    } else {
+        data.forEach((entry, index) => {
         const row = document.createElement("tr");
 
         // Username column
@@ -73,10 +91,11 @@
         row.appendChild(scoreCell);
 
         tableBody.appendChild(row);
-    });
+        });
+    }
     }
 
-    // Initial load of leaderboard data
+    // Initial load
     updateLeaderboardTable();
 
     // Auto-refresh every 5 minutes (300,000 milliseconds)
