@@ -139,14 +139,16 @@
     
     <header>
         <h1>Prime Factor Game</h1>
+        <!-- Ensure this element exists if your game.js expects it -->
+        <div id="username-display"></div>
     </header>
     
     <!-- Start Screen -->
     <div id="start-screen">
         <label for="username-input">Enter your name:</label>
-        <input type="text" id="username-input" maxlength="35" placeholder="Your name here...">
-        <div id="char-count">Character limit: 35</div>
-        <button id="start-btn">Start Game</button>
+        <input type="text" id="username-input" maxlength="35" placeholder="Your name here..." />
+        <div id="char-count">Character count: 0/35</div>
+        <button id="start-game-btn">Start Game</button>
     </div>
 
     </div>
@@ -190,14 +192,14 @@
     </div>
         <button onclick="location.reload()">Play Again</button>
 
-<script type="module" src="game.js"></script>
-<script>
-    // Update the character count for the username input
-    const usernameInput = document.getElementById("username-input");
-    const charCountDisplay = document.getElementById("char-count");
-    usernameInput.addEventListener("input", () => {
+    <script type="module" src="game.js"></script>
+    <script>
+        // Update the character count for the username input
+        const usernameInput = document.getElementById("username-input");
+        const charCountDisplay = document.getElementById("char-count");
+        usernameInput.addEventListener("input", () => {
         charCountDisplay.textContent = `Character count: ${usernameInput.value.length}/35`;
-    });
-</script>
-</body>
-</html>
+        });
+    </script>
+    </body>
+    </html>

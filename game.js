@@ -73,8 +73,7 @@ class PrimeFactorGame {
 
 
     startGame() {
-        this.username = this.username;
-        this.username = document.getElementById("username").value || "Player";
+        this.username = document.getElementById("username-input").value || "Player";
         document.getElementById("username-display").innerText = `Player: ${this.username}`;
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("game-screen").style.display = "block";
