@@ -4,6 +4,8 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { initializeFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
 
 // 2a. Firebase Configuration
 const firebaseConfig = {
@@ -20,7 +22,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // Disabling Analytics for now.
 // const analytics = getAnalytics(app);
-const db = getFirestore(app);
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true
+});
 const auth = getAuth(app);
 
 // 3.Sign in user anonymously
@@ -367,7 +371,6 @@ async function submitScore(username, score) {
 
 // 6. Initialize Game Object
 const game = new PrimeFactorGame();
-
 // 7. Export startGame()
 export function startGame() {
     game.startGame();
