@@ -352,20 +352,16 @@ class PrimeFactorGame {
 
 // 6. Initialize Game Object
 document.addEventListener("DOMContentLoaded", () => {
-  // Create a new game instance and attach it to the window for global access (if desired)
   const game = new PrimeFactorGame();
-  window.game = game;  // Now you can reference window.game from anywhere
+  window.game = game;  // Expose game globally if needed
 
-  // Find the start button by its ID
+  // Bind the start button click event
   const startGameBtn = document.getElementById("start-btn");
   if (!startGameBtn) {
     console.error("Start game button not found!");
     return;
   }
-  
-  // Bind the start button click event
   startGameBtn.addEventListener("click", () => {
-    // Get the username from the input field
     const usernameInput = document.getElementById("username-input");
     if (!usernameInput) {
       console.error("Username input element not found!");
@@ -376,11 +372,10 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Please enter your name.");
       return;
     }
-    
-    // Call the startGame function on the game instance
     game.startGame(username);
   });
 });
+
 
 const game = new PrimeFactorGame();
 export function startGame() {
