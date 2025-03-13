@@ -191,21 +191,20 @@
         <button onclick="location.reload()">Play Again</button>
 </body>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        const startGameBtn = document.getElementById('start-game-btn');
+
+        // Inside game.js, after defining your class:
+        document.addEventListener("DOMContentLoaded", () => {
+        const game = new PrimeFactorGame();
+        window.game = game; // This makes it globally accessible
+
+        // Optionally, bind the start button here:
+        const startGameBtn = document.getElementById("start-game-btn");
         if (startGameBtn) {
-            startGameBtn.addEventListener('click', () => {
-            // Assuming your game logic is encapsulated in an object (for example, window.game)
-            // and that it exposes a startGame() method.
-            if (window.game && typeof window.game.startGame === 'function') {
-                window.game.startGame();
-            } else {
-                console.error("Game start function not found!");
-            }
+            startGameBtn.addEventListener("click", () => {
+            window.game.startGame();
             });
-        } else {
-            console.error("Start game button with ID 'start-game-btn' not found!");
         }
         });
+
     </script>
 </html>
