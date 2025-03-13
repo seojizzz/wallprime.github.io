@@ -1,6 +1,6 @@
 # Prime Factorization Challenge (Competitive)
 # Leaderboard is DOWN until 12th March
-[You can access the game here!](https://seojizzz.github.io/runfactor.github.io/)
+[You can access the game here!](https://seojizzz.github.io/wallprime.github.io/)
 
 ## Objective
 The goal of the game is to factorize as many composite numbers as possible within a time limit of 2 minutes. Players earn points by correctly selecting prime factors and can increase their score through combos, clear bonuses, and perfect clears.
