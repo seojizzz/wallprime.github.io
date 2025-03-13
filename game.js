@@ -315,6 +315,7 @@ class PrimeFactorGame {
       }
       return Object.entries(factors).map(([base, exp]) => exp > 1 ? `${base}^${exp}` : base).join(" × ");
     }
+  }
 
     endGame() {
         // Ensure elements exist before modifying them
@@ -340,8 +341,8 @@ class PrimeFactorGame {
             ? this.wrongList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
             : '<li>None</li>';
         gameOver();
+        return;
     }  
-}
 }
 
 // 6. Initialize Game Object
