@@ -109,32 +109,32 @@ class PrimeFactorGame {
           count--;
         } else {
           clearInterval(countdownInterval);
-          // Once the countdown is over, start the 2-minute timer:
+          // After countdown, start the game timer and create buttons
           this.startTimer();
-          // Also create the buttons for the game
           this.createButtons();
         }
       }, 1000);
     }
     
     startTimer() {
-      // Set the total race time to 120 seconds (2 minutes)
-      this.timerDuration = 120;
-      // Record the real start time using the system clock
+      this.timerDuration = 120; // 2 minutes in seconds
       this.startTime = Date.now();
-      // Update the timer display every 100ms (or your preferred interval)
       this.timerInterval = setInterval(() => this.updateTimer(), 100);
     }
     
     updateTimer() {
-      const elapsed = (Date.now() - this.startTime) / 1000; // elapsed seconds
+      const elapsed = (Date.now() - this.startTime) / 1000;
       const remaining = Math.max(0, this.timerDuration - elapsed);
-      document.getElementById("timer-display").innerText = `Time Left: ${remaining.toFixed(2)}s`;
+      const timerDisplay = document.getElementById("timer-display");
+      if (timerDisplay) {
+        timerDisplay.innerText = `Time Left: ${remaining.toFixed(2)}s`;
+      }
       if (remaining <= 0) {
         clearInterval(this.timerInterval);
         this.endGame();
       }
     }
+    
 
     beginGame() {
         console.log("Game has started!"); // Debugging line
@@ -147,12 +147,11 @@ class PrimeFactorGame {
     createButtons() {
       const buttonsContainer = document.getElementById("buttons");
       buttonsContainer.innerHTML = "";
-      // For each prime, create a button
       [...this.easyPrimes, ...this.hardPrimes].forEach(prime => {
         const button = document.createElement("button");
-        button.textContent = prime;
         button.classList.add("prime-btn");
-        // Use an arrow function to preserve 'this'
+        button.textContent = prime;
+        // Use an arrow function to preserve the correct 'this'
         button.addEventListener("click", () => {
           this.handleGuess(prime, button);
         });
