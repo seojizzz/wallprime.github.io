@@ -1,51 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Leaderboard</title>
-  <style>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8">
+<title>Leaderboard</title>
+<style>
     table {
-      width: 100%;
-      border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
     }
     th, td {
-      border: 1px solid #aaa;
-      padding: 8px;
-      text-align: left;
+    border: 1px solid #aaa;
+    padding: 8px;
+    text-align: left;
     }
     th {
-      background-color: #f2f2f2;
+    background-color: #f2f2f2;
     }
-  </style>
+</style>
 </head>
 <body>
-  <h1>Leaderboard</h1>
-  <table id="leaderboard-table">
+<h1>Leaderboard</h1>
+<table id="leaderboard-table">
     <thead>
-      <tr>
+    <tr>
         <th>Username</th>
         <th>Score</th>
-      </tr>
+    </tr>
     </thead>
     <tbody>
-      <!-- Leaderboard entries will be injected here -->
+    <!-- Leaderboard entries will be injected here -->
     </tbody>
-  </table>
+</table>
 
-  <script type="module">
+<script type="module">
     // Import Firebase modules from the CDN (using Firebase v9 modular syntax)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
     // Your Firebase configuration (update with your project's details)
     const firebaseConfig = {
-      apiKey: "AIzaSyDBgRh-t6pJOEZfQanb-T6KYNj_XbL_YP8",
-      authDomain: "runfactor-cf724.firebaseapp.com",
-      projectId: "runfactor-cf724",
-      storageBucket: "runfactor-cf724.firebasestorage.app",
-      messagingSenderId: "882591954418",
-      appId: "1:882591954418:web:39964ebfa664061fb4a76b",
-      measurementId: "G-KWWWHF4NQE"
+    apiKey: "AIzaSyDBgRh-t6pJOEZfQanb-T6KYNj_XbL_YP8",
+    authDomain: "runfactor-cf724.firebaseapp.com",
+    projectId: "runfactor-cf724",
+    storageBucket: "runfactor-cf724.firebasestorage.app",
+    messagingSenderId: "882591954418",
+    appId: "1:882591954418:web:39964ebfa664061fb4a76b",
+    measurementId: "G-KWWWHF4NQE"
     };
 
     // Initialize Firebase and Firestore
@@ -54,23 +55,23 @@
 
     // Function to fetch the top 50 leaderboard entries (sorted by score descending)
     async function fetchLeaderboard() {
-      const leaderboardRef = collection(db, "leaderboard");
-      const leaderboardQuery = query(leaderboardRef, orderBy("score", "desc"), limit(50));
-      const querySnapshot = await getDocs(leaderboardQuery);
-      const leaderboardData = [];
-      querySnapshot.forEach(doc => {
+    const leaderboardRef = collection(db, "leaderboard");
+    const leaderboardQuery = query(leaderboardRef, orderBy("score", "desc"), limit(50));
+    const querySnapshot = await getDocs(leaderboardQuery);
+    const leaderboardData = [];
+    querySnapshot.forEach(doc => {
         leaderboardData.push(doc.data());
-      });
-      return leaderboardData;
+    });
+    return leaderboardData;
     }
 
     // Function to update the leaderboard table in the DOM
     async function updateLeaderboardTable() {
-      const data = await fetchLeaderboard();
-      const tableBody = document.querySelector("#leaderboard-table tbody");
-      tableBody.innerHTML = ""; // Clear existing rows
+    const data = await fetchLeaderboard();
+    const tableBody = document.querySelector("#leaderboard-table tbody");
+    tableBody.innerHTML = ""; // Clear existing rows
 
-      data.forEach(entry => {
+    data.forEach(entry => {
         const row = document.createElement("tr");
 
         // Username column
@@ -84,7 +85,7 @@
         row.appendChild(scoreCell);
 
         tableBody.appendChild(row);
-      });
+    });
     }
 
     // Initial load
@@ -92,6 +93,6 @@
 
     // Update the leaderboard every 5 minutes (300,000 milliseconds)
     setInterval(updateLeaderboardTable, 300000);
-  </script>
+</script>
 </body>
 </html>
