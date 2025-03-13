@@ -397,7 +397,7 @@ class PrimeFactorGame {
       return;
   }  
 }
-\
+
 
 // 6. Initialize Game Object
 document.addEventListener("DOMContentLoaded", () => {
