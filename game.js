@@ -314,8 +314,8 @@ class PrimeFactorGame {
           }
       }
       return Object.entries(factors).map(([base, exp]) => exp > 1 ? `${base}^${exp}` : base).join(" × ");
+      }
     }
-  }
 
     endGame() {
         // Ensure elements exist before modifying them
