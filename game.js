@@ -20,11 +20,7 @@ const firebaseConfig = {
 
 // 2b. Initialize Firebase
 const app = initializeApp(firebaseConfig);
-// Disabling Analytics for now.
-// const analytics = getAnalytics(app);
-const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true
-});
+const db = getFirestore(app);
 const auth = getAuth(app);
 
 // 3.Sign in user anonymously
