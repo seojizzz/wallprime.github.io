@@ -40,6 +40,7 @@ class PrimeFactorGame {
       this.hardPrimes = [13, 17, 19, 23];
       this.usedNumbers = new Set();
       this.score = 0;
+      this.db=db;
       this.combo = 0;
       this.perfectStreak = 0;
       this.correctList = [];
@@ -407,19 +408,20 @@ class PrimeFactorGame {
 
 // New method to submit the score.
 async submitScore() {
-    try {
-        // Use the username as the document ID so that each player is registered only once.
-        await setDoc(doc(this.db, "leaderboard", this.username), {
-            username: this.username,
-            score: this.score,
-            submittedAt: serverTimestamp()
-        });
-        console.log("Score submitted successfully to Firebase.");
-    } catch (error) {
-        console.error("Error submitting score: ", error);
-    }
+  try {
+      // Use the Firestore instance (this.db) as the first argument.
+      await setDoc(doc(this.db, "leaderboard", this.username), {
+          username: this.username,
+          score: this.score,
+          submittedAt: serverTimestamp()
+      });
+      console.log("Score submitted successfully to Firebase.");
+  } catch (error) {
+      console.error("Error submitting score: ", error);
+  }
 }
 }
+
 
 // When the DOM is ready, create the game instance and bind the start button
 document.addEventListener("DOMContentLoaded", () => {
