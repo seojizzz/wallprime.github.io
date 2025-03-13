@@ -229,18 +229,20 @@ class PrimeFactorGame {
       const penalty = this.fibonacci(this.mistakeCount) * 0.1;
       this.totalPenalty += penalty;
       console.log("Penalty applied. Total penalty: ", this.totalPenalty);
-      // Immediately update the timer display
       this.updateTimer();
-    }    
+    }     
     
     fibonacci(n) {
       if (n <= 1) return n;
       let a = 0, b = 1;
       for (let i = 2; i <= n; i++) {
-        [a, b] = [b, a + b];
+        let temp = a + b;
+        a = b;
+        b = temp;
       }
       return b;
     }
+    
     
     // Called when the current question is fully factorized.
     completeFactorization() {
@@ -310,7 +312,7 @@ class PrimeFactorGame {
         this.timeLeft = Math.max(0, this.timeLeft - 0.01);
         document.getElementById("timer-display").innerText = `Time Left: ${this.timeLeft.toFixed(2)}s`;
     }
-    
+
     getFactorization(number) {
       let n = number;
       let factors = {};
