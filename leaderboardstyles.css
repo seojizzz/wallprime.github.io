@@ -1,0 +1,67 @@
+/* Center the table and set a maximum width */
+#leaderboard-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 90%;
+    max-width: 600px;
+}
+
+/* Table header and cell styling */
+#leaderboard-table th,
+#leaderboard-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+/* Table header style */
+#leaderboard-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+/* First row (1st place): golden background with trophy emoji */
+#leaderboard-table tbody tr:nth-child(1) {
+    background-color: #ffd700; /* Gold */
+    color: black;
+    font-weight: bold;
+    position: relative;
+}
+#leaderboard-table tbody tr:nth-child(1) td:first-child::before {
+    content: "🏆 ";
+}
+
+/* Second row (2nd place): silver background */
+#leaderboard-table tbody tr:nth-child(2) {
+    background-color: #C0C0C0; /* Silver */
+    color: black;
+    font-weight: bold;
+}
+
+/* Third to twelfth rows: bronze background */
+#leaderboard-table tbody tr:nth-child(3),
+#leaderboard-table tbody tr:nth-child(4),
+#leaderboard-table tbody tr:nth-child(5),
+#leaderboard-table tbody tr:nth-child(6),
+#leaderboard-table tbody tr:nth-child(7),
+#leaderboard-table tbody tr:nth-child(8),
+#leaderboard-table tbody tr:nth-child(9),
+#leaderboard-table tbody tr:nth-child(10),
+#leaderboard-table tbody tr:nth-child(11),
+#leaderboard-table tbody tr:nth-child(12) {
+    background-color: #cd7f32; /* Bronze */
+    color: black;
+}
+
+/* Ensure table cells are not too wide */
+#leaderboard-table td {
+    max-width: 150px;
+    word-wrap: break-word;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    #leaderboard-table {
+    width: 100%;
+    }
+}

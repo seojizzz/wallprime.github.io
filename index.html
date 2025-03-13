@@ -5,6 +5,7 @@
     <meta http-equiv="Expires" content="0">            
 <head>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prime Factorization Challenge</title>
@@ -28,14 +29,98 @@
             font-size: 24px;
             cursor: pointer;
         }
-        .correct {
-            background-color: #90EE90; /* Green */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
         }
-        .wrong {
-            background-color: #FFB6C1; /* Red */
+        nav {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
         }
-        #game-screen, #end-screen {
-            display: none;
+        nav a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        header {
+            text-align: center;
+            margin: 20px 0;
+        }
+            /* Start Screen */
+        #start-screen {
+            padding: 20px;
+            text-align: center;
+        }
+        #start-screen label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        #start-screen input[type="text"] {
+            width: 80%;
+            max-width: 300px;
+            padding: 8px;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        #char-count {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        #start-game-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+            /* End Screen */
+        #end-screen {
+            padding: 20px;
+            text-align: center;
+        }
+        #end-screen .final-score {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+            /* Toggleable lists for factorization details */
+        .toggle-list {
+            margin: 10px auto;
+            max-width: 90%;
+            text-align: left;
+        }
+        .toggle-list summary {
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px;
+            background: #eee;
+            border: 1px solid #ccc;
+        }
+        .toggle-list ul {
+            margin: 0;
+            padding: 10px;
+            list-style: none;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+        #play-again-button {
+            margin: 20px 0;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+            /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #start-screen input[type="text"],
+            #start-game-button {
+                width: 90%;
+            }
         }
     </style>
 </head>
@@ -44,40 +129,31 @@
         <a href="https://seojizzz.github.io/wallprime.github.io/leaderboard.html" target="_blank">Leaderboard</a>
     </div>  
 <body>
-    <title>WallPrime@SJI</title>
+<title>WallPrime@SJI</title>
+<body>
+    <!-- Navigation links above header -->
+    <nav>
+        <a href="https://github.com/your-repo-url" target="_blank">GitHub Repo</a>
+        <a href="leaderboard.html" target="_blank">Leaderboard</a>
+    </nav>
+    
+    <header>
+        <h1>Prime Factor Game</h1>
+    </header>
+    
     <!-- Start Screen -->
     <div id="start-screen">
-        <h1>Prime Factorization Challenge</h1>
-        <label for="username">Enter your name:</label>
-        <input type="text" id="username" maxlength="35" oninput="updateCharCount()">
-        <p id="char-count">0 / 35</p>
-        <script>
-            function updateCharCount() {
-                let input = document.getElementById("username");
-                let charCount = document.getElementById("char-count");
-                charCount.textContent = `${input.value.length} / 35`;
-            }
-        </script>            
-        <button id="start-btn">Start</button>
-        <script type="module">
-            import { startGame } from "./game.js";
-            document.getElementById("start-btn").addEventListener("click", function() {
-                let username = document.getElementById("username").value;
-                if (username.length > 35) {
-                    alert("Username must be 35 characters or less.");
-                } else if (username.trim() === "") {
-                    alert("Username cannot be empty.");
-                } else {
-                    document.getElementById("start-screen").style.display = "none";
-                    document.getElementById("game-screen").style.display = "block";
-                    startGame();
-                }
-            });
-        </script>              
+        <label for="username-input">Enter your name:</label>
+        <input type="text" id="username-input" maxlength="35" placeholder="Your name here...">
+        <div id="char-count">Character count: 0/35</div>
+        <button id="start-game-button">Start Game</button>
+    </div>
+
     </div>
     <!-- Game Screen -->
-    <div id="game-screen">
+    <div id="game-screen" style="display: none;">
         <h1>Prime Factorization Challenge</h1>
+        <p>Countdown: <span id="countdown">3</span></p>
         <p id="username-display" style="position: absolute; top: 10px; right: 20px;"></p>
         <p id="timer-display">Time Left: 120.00s</p>
         <audio id="background-music" src="music.mp3" loop></audio>
@@ -93,14 +169,26 @@
     </div>
     <!-- End Screen -->
     <div id="end-screen" style="display: none;">
-        <h1>Game Over</h1>
-        <p id="final-score"></p> <!-- Final score is displayed here -->
-        <h2>Correctly Factorized</h2>
-        <ul id="correct-list"></ul>
-
-        <h2>Incorrectly Factorized</h2>
-        <ul id="wrong-list"></ul>
-        <button onclick="location.reload()">Play Again</button>
+        <div class="final-score" id="final-score">Final Score: 0</div>
+        <button id="play-again-button">Play Again</button>
+    
+        <!-- Toggleable list for correctly factorized numbers -->
+        <details class="toggle-list" open>
+        <summary>Correctly Factorized</summary>
+        <ul id="correct-list">
+            <!-- Correct factorization items will go here -->
+        </ul>
+        </details>
+        
+        <!-- Toggleable list for incorrectly factorized numbers -->
+        <details class="toggle-list" open>
+        <summary>Incorrectly Factorized</summary>
+        <ul id="wrong-list">
+            <!-- Incorrect factorization items will go here -->
+        </ul>
+        </details>
     </div>
+        <button onclick="location.reload()">Play Again</button>
+
 </body>
 </html>

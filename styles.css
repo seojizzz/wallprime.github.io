@@ -108,3 +108,97 @@ body {
     width: 100%; /* Takes full width to stay in center */
     margin: 20px 0; /* Adds spacing */
 }
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+nav {
+    background: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+nav a {
+    color: #fff;
+    margin: 0 10px;
+    text-decoration: none;
+    font-size: 16px;
+}
+header {
+    text-align: center;
+    margin: 20px 0;
+}
+    /* Start Screen */
+#start-screen {
+    padding: 20px;
+    text-align: center;
+}
+#start-screen label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+#start-screen input[type="text"] {
+    width: 80%;
+    max-width: 300px;
+    padding: 8px;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+#char-count {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 15px;
+}
+#start-game-button {
+    padding: 15px 30px;
+    font-size: 20px;
+    cursor: pointer;
+}
+    /* End Screen */
+#end-screen {
+    padding: 20px;
+    text-align: center;
+}
+#end-screen .final-score {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 20px 0;
+    text-align: center;
+}
+    /* Toggleable lists for factorization details */
+.toggle-list {
+    margin: 10px auto;
+    max-width: 90%;
+    text-align: left;
+}
+.toggle-list summary {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px;
+    background: #eee;
+    border: 1px solid #ccc;
+}
+.toggle-list ul {
+    margin: 0;
+    padding: 10px;
+    list-style: none;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+#play-again-button {
+    margin: 20px 0;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
+    /* Responsive adjustments */
+@media (max-width: 768px) {
+    #start-screen input[type="text"],
+    #start-game-button {
+        width: 90%;
+    }
+}
