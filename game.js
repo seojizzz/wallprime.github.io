@@ -55,6 +55,7 @@ class PrimeFactorGame {
         this.gameRunning = false;
         this.username = "";
         this.difficultyThresholds = [35000, 90000, 200000];
+        this.score = 0;
         //.....
     }
     bindEvents() {
@@ -70,8 +71,6 @@ class PrimeFactorGame {
           }
       });
     }
-
-
     startGame() {
         this.raceDuration = 120;
         // Record the real start time
@@ -144,18 +143,23 @@ class PrimeFactorGame {
         this.newRound();
         this.timerInterval = setInterval(() => this.updateTimer(), 10);
     }
+
     createButtons() {
-        const buttonContainer = document.getElementById("buttons");
-        buttonContainer.innerHTML = "";
-        
-        [...this.easyPrimes, ...this.hardPrimes].forEach(prime => {
-            let btn = document.createElement("button");
-            btn.innerText = prime;
-            btn.classList.add("prime-btn");
-            btn.onclick = () => this.handleGuess(prime, btn);
-            buttonContainer.appendChild(btn);
+      const buttonsContainer = document.getElementById("buttons");
+      buttonsContainer.innerHTML = "";
+      // For each prime, create a button
+      [...this.easyPrimes, ...this.hardPrimes].forEach(prime => {
+        const button = document.createElement("button");
+        button.textContent = prime;
+        button.classList.add("prime-btn");
+        // Use an arrow function to preserve 'this'
+        button.addEventListener("click", () => {
+          this.handleGuess(prime, button);
         });
+        buttonsContainer.appendChild(button);
+      });
     }
+
     setQuestion() {
         let number;
         do {
@@ -229,7 +233,6 @@ class PrimeFactorGame {
     }  
 
     updateScore(prime) {
-      let baseScore = this.getBaseScore(prime);
       // Increase combo counter.
       this.combo++;
       let comboBonus = 50 * this.combo;
@@ -239,7 +242,6 @@ class PrimeFactorGame {
       let targetScore = this.score + pointsEarned;
       let steps = 20;
       let stepValue = (targetScore - currentScore) / steps;
-      const scoreDisplay = document.getElementById("score-display");
       const actionText = document.getElementById("action-text");
       
       actionText.innerText = `+${pointsEarned.toFixed(2)}`;
@@ -261,6 +263,13 @@ class PrimeFactorGame {
           scoreDisplay.innerText = this.score.toFixed(2);
         }
       }, 50);
+      const baseScore = this.getBaseScore(prime);
+      this.score += baseScore;
+      const scoreDisplay = document.getElementById("score-display");
+      if (scoreDisplay) {
+        scoreDisplay.innerText = this.score.toFixed(2);
+      }
+
     }
     
     getBaseScore(prime) {
