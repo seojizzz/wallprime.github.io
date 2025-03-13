@@ -100,6 +100,43 @@ class PrimeFactorGame {
             }
         }, 1000);
     }
+
+    startCountdown() {
+      let count = 3;
+      const countdownEl = document.getElementById("countdown");
+      const countdownInterval = setInterval(() => {
+        if (count > 0) {
+          countdownEl.innerText = count;
+          count--;
+        } else {
+          clearInterval(countdownInterval);
+          // Once the countdown is over, start the 2-minute timer:
+          this.startTimer();
+          // Also create the buttons for the game
+          this.createButtons();
+        }
+      }, 1000);
+    }
+    
+    startTimer() {
+      // Set the total race time to 120 seconds (2 minutes)
+      this.timerDuration = 120;
+      // Record the real start time using the system clock
+      this.startTime = Date.now();
+      // Update the timer display every 100ms (or your preferred interval)
+      this.timerInterval = setInterval(() => this.updateTimer(), 100);
+    }
+    
+    updateTimer() {
+      const elapsed = (Date.now() - this.startTime) / 1000; // elapsed seconds
+      const remaining = Math.max(0, this.timerDuration - elapsed);
+      document.getElementById("timer-display").innerText = `Time Left: ${remaining.toFixed(2)}s`;
+      if (remaining <= 0) {
+        clearInterval(this.timerInterval);
+        this.endGame();
+      }
+    }
+
     beginGame() {
         console.log("Game has started!"); // Debugging line
         this.gameRunning = true;
@@ -182,24 +219,6 @@ class PrimeFactorGame {
       }
     }
 
-    updateTimer() {
-      // Calculate elapsed time in seconds using the system clock
-      const elapsed = (Date.now() - this.startTime) / 1000;
-      // Adjust for any penalty if necessary
-      const adjustedElapsed = elapsed + this.totalPenalty;
-      // Calculate remaining time
-      const remaining = Math.max(0, this.raceDuration - adjustedElapsed);
-      
-      // Update the display
-      document.getElementById("timer-display").innerText = `Time Left: ${remaining.toFixed(2)}s`;
-      
-      // End the game if time is up
-      if (remaining <= 0) {
-        clearInterval(this.timerInterval);
-        this.endGame();
-      }
-    }
-
     newRound() {
         this.mistakeMade = false;
         this.currentNumber = this.setQuestion();
@@ -208,6 +227,42 @@ class PrimeFactorGame {
         console.log("New number generated:", this.currentNumber); // Debugging line
         document.getElementById("number-display").innerText = `Factorize: ${this.currentNumber}`;
     }  
+
+    updateScore(prime) {
+      let baseScore = this.getBaseScore(prime);
+      // Increase combo counter.
+      this.combo++;
+      let comboBonus = 50 * this.combo;
+      let pointsEarned = baseScore + comboBonus;
+      
+      let currentScore = this.score;
+      let targetScore = this.score + pointsEarned;
+      let steps = 20;
+      let stepValue = (targetScore - currentScore) / steps;
+      const scoreDisplay = document.getElementById("score-display");
+      const actionText = document.getElementById("action-text");
+      
+      actionText.innerText = `+${pointsEarned.toFixed(2)}`;
+      actionText.style.display = "block";
+      actionText.classList.remove("action-popup");
+      void actionText.offsetWidth;
+      actionText.classList.add("action-popup");
+      
+      let step = 0;
+      let interval = setInterval(() => {
+        if (step < steps) {
+          currentScore += stepValue;
+          this.score = currentScore;
+          scoreDisplay.innerText = this.score.toFixed(2);
+          step++;
+        } else {
+          clearInterval(interval);
+          this.score = targetScore;
+          scoreDisplay.innerText = this.score.toFixed(2);
+        }
+      }, 50);
+    }
+    
     getBaseScore(prime) {
       if ([2, 3, 5, 7].includes(prime)) return 100;
       if ([11, 13, 17].includes(prime)) return 300;
