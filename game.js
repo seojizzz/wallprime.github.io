@@ -55,35 +55,38 @@ class PrimeFactorGame {
       this.gameRunning = false;
       this.username = "";
       this.difficultyThresholds = [35000, 90000, 200000];
-      // ... (any additional properties)
+      // Additional properties:
+      this.totalPenalty = 0;
+      this.timerDuration = 120; // 2 minutes in seconds
+      // Bind any non-DOM events if needed here.
   }
   
   bindEvents() {
-      const buttonsEl = document.getElementById("buttons");
-      if (!buttonsEl) {
-          console.error("Element with ID 'buttons' not found!");
-          return;
-      }
-      buttonsEl.addEventListener("click", (e) => {
-          if (e.target && e.target.classList.contains("prime-btn")) {
-              const guessedFactor = parseInt(e.target.textContent, 10);
-              this.handleGuess(guessedFactor, e.target);
-          }
-      });
+    const buttonsEl = document.getElementById("buttons");
+    if (!buttonsEl) {
+        console.error("Element with ID 'buttons' not found!");
+        return;
+    }
+    buttonsEl.addEventListener("click", (e) => {
+        if (e.target && e.target.classList.contains("prime-btn")) {
+            const guessedFactor = parseInt(e.target.textContent, 10);
+            this.handleGuess(guessedFactor, e.target);
+        }
+    });
   }
   
   startGame() {
-      // Set race duration
+      // Set race duration and reset penalty
       this.raceDuration = 120;
-      // Reset penalty and record username from input
       this.totalPenalty = 0;
+      // Get username from input field (default to "Player" if empty)
       this.username = document.getElementById("username-input").value || "Player";
       document.getElementById("username-display").innerText = `Player: ${this.username}`;
       // Hide start screen, show game screen
       document.getElementById("start-screen").style.display = "none";
       document.getElementById("game-screen").style.display = "block";
       
-      // Start countdown on number-display
+      // Start a 3-second countdown on the number-display element
       let countdown = 3;
       document.getElementById("number-display").innerText = `Starting in ${countdown}...`;
   
@@ -94,28 +97,29 @@ class PrimeFactorGame {
           if (countdown <= 0) {
               clearInterval(countdownInterval);
               console.log("Starting game...");
-              // Now start the actual game (timer starts after countdown)
+              // Now start the actual game
               this.beginGame();
           }
       }, 1000);
   }
   
-  // (Not using startCountdown() here since startGame() handles countdown.)
-  
   startTimer() {
-      // Record the real start time at the moment the game begins
+      // Record the actual start time using system clock
       this.startTime = Date.now();
       // Update the timer display every 100ms
       this.timerInterval = setInterval(() => this.updateTimer(), 100);
   }
   
   updateTimer() {
+      // Calculate elapsed time in seconds using the system clock
       const elapsed = (Date.now() - this.startTime) / 1000;
+      // Adjust elapsed time by adding any penalties
       const remaining = Math.max(0, this.timerDuration - elapsed - this.totalPenalty);
       const timerDisplay = document.getElementById("timer-display");
       if (timerDisplay) {
           timerDisplay.innerText = `Time Left: ${remaining.toFixed(2)}s`;
       }
+      // If time is up, clear the interval and end the game
       if (remaining <= 0) {
           clearInterval(this.timerInterval);
           this.endGame();
@@ -127,7 +131,7 @@ class PrimeFactorGame {
       this.gameRunning = true;
       // Set the start time now so the timer starts after the countdown
       this.startTime = Date.now();
-      // Start the timer for the 2-minute race
+      // Start the 2-minute timer
       this.startTimer();
       // Create the buttons and start the first round
       this.createButtons();
@@ -141,7 +145,7 @@ class PrimeFactorGame {
           const button = document.createElement("button");
           button.classList.add("prime-btn");
           button.textContent = prime;
-          // Use arrow function to preserve the context
+          // Use an arrow function so that 'this' refers to the game instance
           button.addEventListener("click", () => {
               this.handleGuess(prime, button);
           });
@@ -222,7 +226,7 @@ class PrimeFactorGame {
   }
   
   updateScore(prime) {
-      // Declare baseScore first
+      // Declare baseScore before using it
       const baseScore = this.getBaseScore(prime);
       // Increase combo counter.
       this.combo++;
@@ -247,16 +251,17 @@ class PrimeFactorGame {
           if (step < steps) {
               currentScore += stepValue;
               this.score = currentScore;
-              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+              if (scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
               step++;
           } else {
               clearInterval(interval);
               this.score = targetScore;
-              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+              if (scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
           }
       }, 50);
+      // Also add the base score immediately
       this.score += baseScore;
-      if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+      if (scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
   }
   
   getBaseScore(prime) {
@@ -334,12 +339,12 @@ class PrimeFactorGame {
           if (step < steps) {
               currentScore += stepValue;
               this.score = currentScore;
-              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+              if (scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
               step++;
           } else {
               clearInterval(interval);
               this.score = targetScore;
-              if(scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
+              if (scoreDisplay) scoreDisplay.innerText = this.score.toFixed(2);
           }
       }, 50);
   }
@@ -354,6 +359,11 @@ class PrimeFactorGame {
     
       // Update the display
       document.getElementById("timer-display").innerText = `Time Left: ${remaining.toFixed(2)}s`;
+    
+      if (remaining <= 0) {
+          clearInterval(this.timerInterval);
+          this.endGame();
+      }
   }
   
   getFactorization(number) {
@@ -371,7 +381,7 @@ class PrimeFactorGame {
   }
   
   endGame() {
-      // Ensure elements exist before modifying them
+      // Ensure end-screen elements exist
       const endScreen = document.getElementById("end-screen");
       const finalScoreElement = document.getElementById("final-score");
       const correctListElement = document.getElementById("correct-list");
@@ -381,7 +391,9 @@ class PrimeFactorGame {
           console.error("End screen elements not found!");
           return;
       }
+      // Hide the entire game screen
       document.getElementById("game-screen").style.display = "none";
+      // Show the end screen
       endScreen.style.display = "block";
   
       finalScoreElement.innerText = `Final Score: ${this.score.toFixed(1)}`;
@@ -393,35 +405,33 @@ class PrimeFactorGame {
       wrongListElement.innerHTML = this.wrongList.length > 0 
           ? this.wrongList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
           : '<li>None</li>';
-      gameOver();
-      return;
+  
+      // Removed gameOver() call to ensure endGame completes
   }  
 }
 
-
-// 6. Initialize Game Object
+// When the DOM is ready, create the game instance and bind the start button
 document.addEventListener("DOMContentLoaded", () => {
   const game = new PrimeFactorGame();
-  window.game = game;  // Expose game globally if needed
-
-  // Bind the start button click event
-  const startGameBtn = document.getElementById("start-btn");
-  if (!startGameBtn) {
-    console.error("Start game button not found!");
-    return;
+  window.game = game; // Expose globally if needed
+  
+  const startBtn = document.getElementById("start-btn");
+  if (!startBtn) {
+      console.error("Start game button not found!");
+      return;
   }
-  startGameBtn.addEventListener("click", () => {
-    const usernameInput = document.getElementById("username-input");
-    if (!usernameInput) {
-      console.error("Username input element not found!");
-      return;
-    }
-    const username = usernameInput.value.trim();
-    if (!username) {
-      alert("Please enter your name.");
-      return;
-    }
-    game.startGame(username);
+  startBtn.addEventListener("click", () => {
+      const usernameInput = document.getElementById("username-input");
+      if (!usernameInput) {
+          console.error("Username input element not found!");
+          return;
+      }
+      const username = usernameInput.value.trim();
+      if (!username) {
+          alert("Please enter your name.");
+          return;
+      }
+      game.startGame();
   });
 });
 
