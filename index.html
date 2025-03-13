@@ -39,40 +39,9 @@
 <body>
     <!-- Sign In Page -->
     <div style="position: absolute; top: 10px; right: 20px;">
-        <a href="https://github.com/seojizzz/runfactor.github.io/tree/main" target="_blank">GitHub Repo</a> |
+        <a href="https://github.com/seojizzz/wallprime.github.io/tree/main" target="_blank">GitHub Repo</a> |
         <a href="https://seojizzz.github.io/runfactor.github.io/leaderboard.html" target="_blank">Leaderboard</a>
     </div>    
-    <div id="sign-in-page">
-        <h1>Sign In</h1>
-        <label for="username-signin">Enter your username:</label>
-        <input type="text" id="username-signin" maxlength="20" placeholder="Username">
-        <button id="join-btn">Join</button>
-    </div>
-
-    <!-- New Account Options (username doesn't exist) -->
-    <div id="account-options">
-        <p id="new-account-message"></p>
-        <div id="new-account-form">
-            <input type="email" id="new-email" placeholder="Email">
-            <input type="password" id="new-password" placeholder="Password">
-            <input type="password" id="confirm-password" placeholder="Confirm Password">
-            <div>
-                <button id="back-btn">Back</button>
-                <button id="play-anon-btn">Play Anonymously</button>
-                <button id="create-account-btn">Create Account</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Existing Account Login -->
-    <div id="existing-account">
-        <p id="welcome-message"></p>
-        <input type="password" id="existing-password" placeholder="Enter your password">
-        <div>
-            <button id="sign-in-btn">Sign In</button>
-            <button id="not-your-account-btn">Not your account?</button>
-        </div>
-    </div>
 
     <!-- Game Screen -->
     <div id="game-screen">
@@ -133,9 +102,28 @@
                 </tbody>
             </table>
         </section>
+        <div id="end-screen">
+            <h1>Game Over</h1>
+            <p>Your final score: <span id="final-score"></span></p>
+            <p>Correct Answers: <span id="correct-answers"></span></p>
+            <p>Wrong Answers: <span id="wrong-answers"></span></p>
+            <input type="text" id="username-input" placeholder="Enter your username" />
+            <button id="submit-score">Submit Score</button>
+        </div>
+        <!-- Import the endScreen.js module -->
+        <script type="module" src="endScreen.js"></script>
+        <script>
+            // Example: Populate score details (update these values based on your game logic)
+            window.finalScore = 150;
+            window.correctAnswers = 10;
+            window.wrongAnswers = 5;
+        
+            // Optionally update the UI:
+            document.getElementById("final-score").textContent = window.finalScore;
+            document.getElementById("correct-answers").textContent = window.correctAnswers;
+            document.getElementById("wrong-answers").textContent = window.wrongAnswers;
+        </script>
     </div>
-
-    
 
 <!-- Load game.js as a module first -->
 <script type="module" src="game.js"></script>
