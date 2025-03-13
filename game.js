@@ -57,7 +57,23 @@ class PrimeFactorGame {
         this.difficultyThresholds = [35000, 90000, 200000];
         //.....
     }
+    bindEvents() {
+      const buttonsEl = document.getElementById("buttons");
+      if (!buttonsEl) {
+          console.error("Element with ID 'buttons' not found!");
+          return;
+      }
+      buttonsEl.addEventListener("click", (e) => {
+          if (e.target && e.target.classList.contains("prime-btn")) {
+              const guessedFactor = parseInt(e.target.textContent, 10);
+              this.handleGuess(guessedFactor, e.target);
+          }
+      });
+    }
+
+
     startGame() {
+        this.username = this.username;
         this.username = document.getElementById("username").value || "Player";
         document.getElementById("username-display").innerText = `Player: ${this.username}`;
         document.getElementById("start-screen").style.display = "none";
@@ -336,16 +352,34 @@ class PrimeFactorGame {
 
 // 6. Initialize Game Object
 document.addEventListener("DOMContentLoaded", () => {
+  // Create a new game instance and attach it to the window for global access (if desired)
   const game = new PrimeFactorGame();
-  // Bind the start button directly:
-  const startGameBtn = document.getElementById("start-btn");
-  if (startGameBtn) {
-    startGameBtn.addEventListener("click", () => {
-      game.startGame();
-    });
-  } else {
+  window.game = game;  // Now you can reference window.game from anywhere
+
+  // Find the start button by its ID
+  const startGameBtn = document.getElementById("start-game-btn");
+  if (!startGameBtn) {
     console.error("Start game button not found!");
+    return;
   }
+  
+  // Bind the start button click event
+  startGameBtn.addEventListener("click", () => {
+    // Get the username from the input field
+    const usernameInput = document.getElementById("username-input");
+    if (!usernameInput) {
+      console.error("Username input element not found!");
+      return;
+    }
+    const username = usernameInput.value.trim();
+    if (!username) {
+      alert("Please enter your name.");
+      return;
+    }
+    
+    // Call the startGame function on the game instance
+    game.startGame(username);
+  });
 });
 
 const game = new PrimeFactorGame();

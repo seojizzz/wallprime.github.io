@@ -189,22 +189,15 @@
         </details>
     </div>
         <button onclick="location.reload()">Play Again</button>
+
+<script type="module" src="game.js"></script>
+<script>
+    // Update the character count for the username input
+    const usernameInput = document.getElementById("username-input");
+    const charCountDisplay = document.getElementById("char-count");
+    usernameInput.addEventListener("input", () => {
+        charCountDisplay.textContent = `Character count: ${usernameInput.value.length}/35`;
+    });
+</script>
 </body>
-    <script type="module">
-
-        import { startGame } from "./game.js";
-        document.getElementById("start-btn").addEventListener("click", function() {
-            let username = document.getElementById("username").value;
-            if (username.length > 35) {
-                alert("Username must be 35 characters or less.");
-            } else if (username.trim() === "") {
-                alert("Username cannot be empty.");
-            } else {
-                document.getElementById("start-screen").style.display = "none";
-                document.getElementById("game-screen").style.display = "block";
-                startGame();
-            }
-        });
-
-    </script>
 </html>
