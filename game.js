@@ -226,11 +226,12 @@ class PrimeFactorGame {
     // Applies a time penalty for a wrong guess.
     applyPenalty() {
       this.mistakeCount++;
-      let penalty = this.fibonacci(this.mistakeCount) * 0.1;
+      const penalty = this.fibonacci(this.mistakeCount) * 0.1;
       this.totalPenalty += penalty;
-      // Force timer update so penalty is immediately visible.
+      console.log("Penalty applied. Total penalty: ", this.totalPenalty);
+      // Immediately update the timer display
       this.updateTimer();
-    }
+    }    
     
     fibonacci(n) {
       if (n <= 1) return n;
@@ -309,6 +310,7 @@ class PrimeFactorGame {
         this.timeLeft = Math.max(0, this.timeLeft - 0.01);
         document.getElementById("timer-display").innerText = `Time Left: ${this.timeLeft.toFixed(2)}s`;
     }
+    
     getFactorization(number) {
       let n = number;
       let factors = {};
