@@ -39,12 +39,17 @@
         }
     </style>
 </head>
+    <div style="position: absolute; top: 10px; right: 20px;">
+        <a href="https://github.com/seojizzz/wallprime.github.io/tree/main" target="_blank">GitHub Repo</a> |
+        <a href="https://seojizzz.github.io/wallprimer.github.io/leaderboard.html" target="_blank">Leaderboard</a>
+    </div>  
 <body>
-    <title>Prime Factorization Challenge</title>
+    <title>WallPrime@SJI</title>
     <!-- Start Screen -->
     <div id="start-screen">
+        <h1>Prime Factorization Challenge</h1>
         <label for="username">Enter your name:</label>
-        <input type="text" id="username" maxlength="20" oninput="updateCharCount()">
+        <input type="text" id="username" maxlength="35" oninput="updateCharCount()">
         <p id="char-count">0 / 35</p>
         <script>
             function updateCharCount() {
@@ -56,7 +61,6 @@
         <button id="start-btn">Start</button>
         <script type="module">
             import { startGame } from "./game.js";
-        
             document.getElementById("start-btn").addEventListener("click", function() {
                 let username = document.getElementById("username").value;
                 if (username.length > 35) {
@@ -76,12 +80,10 @@
         <h1>Prime Factorization Challenge</h1>
         <p id="username-display" style="position: absolute; top: 10px; right: 20px;"></p>
         <p id="timer-display">Time Left: 120.00s</p>
-
+        <audio id="background-music" src="music.mp3" loop></audio>
         <p id="number-display">Factorize: Generating number...</p>
-
         <div class="game-container">
             <div id="buttons"></div> <!-- Prime buttons centered -->
-
             <div class="score-container">
                 <p id="score-label">Score:</p>
                 <p id="score-display">0</p>

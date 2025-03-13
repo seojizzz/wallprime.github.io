@@ -1,61 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">    
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard</title>
-    <link rel="stylesheet" href="styles.css">
-    <script type="module" src="game.js"></script>
-    
+  <meta charset="UTF-8">
+  <title>Leaderboard</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
 </head>
 <body>
-    <body>
-        <h1>Leaderboard</h1>
-        
-        <table id="leaderboard">
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Username</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body"></tbody>
-        </table>
-    
-        <br>
-        <div style="text-align:center;">
-            <a href="index.html">Back to Game</a>
-        </div>
-    
-        <script type="module">
-            import { fetchLeaderboard } from "./game.js";
-        
-            document.addEventListener("DOMContentLoaded", fetchLeaderboard);
-        </script>   
-        
-        <button id="show-more-btn" onclick="showMoreEntries()">Show More</button>
-        <script type="module">
-            import { fetchLeaderboard, updateLeaderboardTable } from "./game.js";
-        
-            document.addEventListener("DOMContentLoaded", () => {
-                fetchLeaderboard(10); // Show initial 10 entries
-            });
-        
-            window.showMoreEntries = function () {
-                let allEntries = window.fullLeaderboard || [];
-                let moreEntries = allEntries.slice(0, 20); // Show up to 20 entries
-                updateLeaderboardTable(moreEntries);
-                document.getElementById("show-more-btn").style.display = "none"; // Hide button after expanding
-            };
-        </script>
-        
+  <h1>Leaderboard</h1>
+  <table id="leaderboard-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Leaderboard entries will be injected here -->
+    </tbody>
+  </table>
 
-    </body>
-    
+  <script type="module">
+    // Import Firebase modules from the CDN (using Firebase v9 modular syntax)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // Your Firebase configuration (update with your project's details)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBgRh-t6pJOEZfQanb-T6KYNj_XbL_YP8",
+      authDomain: "runfactor-cf724.firebaseapp.com",
+      projectId: "runfactor-cf724",
+      storageBucket: "runfactor-cf724.firebasestorage.app",
+      messagingSenderId: "882591954418",
+      appId: "1:882591954418:web:39964ebfa664061fb4a76b",
+      measurementId: "G-KWWWHF4NQE"
+    };
+
+    // Initialize Firebase and Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Function to fetch the top 50 leaderboard entries (sorted by score descending)
+    async function fetchLeaderboard() {
+      const leaderboardRef = collection(db, "leaderboard");
+      const leaderboardQuery = query(leaderboardRef, orderBy("score", "desc"), limit(50));
+      const querySnapshot = await getDocs(leaderboardQuery);
+      const leaderboardData = [];
+      querySnapshot.forEach(doc => {
+        leaderboardData.push(doc.data());
+      });
+      return leaderboardData;
+    }
+
+    // Function to update the leaderboard table in the DOM
+    async function updateLeaderboardTable() {
+      const data = await fetchLeaderboard();
+      const tableBody = document.querySelector("#leaderboard-table tbody");
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      data.forEach(entry => {
+        const row = document.createElement("tr");
+
+        // Username column
+        const usernameCell = document.createElement("td");
+        usernameCell.textContent = entry.username || "N/A";
+        row.appendChild(usernameCell);
+
+        // Score column
+        const scoreCell = document.createElement("td");
+        scoreCell.textContent = entry.score;
+        row.appendChild(scoreCell);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Initial load
+    updateLeaderboardTable();
+
+    // Update the leaderboard every 5 minutes (300,000 milliseconds)
+    setInterval(updateLeaderboardTable, 300000);
+  </script>
 </body>
 </html>
