@@ -477,19 +477,16 @@ async function loadLeaderboard() {
         console.error("Error loading leaderboard:", error);
     }
 }
-async function submitScore(username, score) {
-    try {
-        const scoresRef = collection(db, "scores"); // Correct Firestore reference
-
-        await addDoc(scoresRef, {
-            username: username,
-            score: score,
-            timestamp: serverTimestamp() // Use Firestore server timestamp
-        });
-
-        console.log("Score submitted successfully!");
-    } catch (error) {
-        console.error("Error submitting score:", error);
+async function submitScore() {
+        try {
+            // Use the username as the document ID so that each player is registered only once.
+            await setDoc(doc(this.db, "leaderboard", this.username), {
+                username: this.username,
+                score: this.score,
+                submittedAt: serverTimestamp()
+            });
+            console.log("Score submitted successfully to Firebase.");
+        } catch (error) {
+            console.error("Error submitting score: ", error);
+        }
     }
-}
-
