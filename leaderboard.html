@@ -1,27 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="leaderboardstyles.css">
 <meta charset="UTF-8">
-<title>Leaderboard</title>
-<style>
-    table {
-    width: 100%;
-    border-collapse: collapse;
-    }
-    th, td {
-    border: 1px solid #aaa;
-    padding: 8px;
-    text-align: left;
-    }
-    th {
-    background-color: #f2f2f2;
-    }
-</style>
+<title>SJI WallPrime Leaderboard</title>
+<link rel="stylesheet" href="leaderboardstyles.css">
 </head>
 <body>
-<h1>Leaderboard</h1>
+<h1>WallPrime Leaderboard</h1>
+
+<!-- Manual Refresh Button -->
+<button id="refresh-leaderboard">Refresh Leaderboard</button>
+
 <table id="leaderboard-table">
     <thead>
     <tr>
@@ -35,11 +24,10 @@
 </table>
 
 <script type="module">
-    // Import Firebase modules from the CDN (using Firebase v9 modular syntax)
+    // Import Firebase modules and initialize Firestore as before
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    // Your Firebase configuration (update with your project's details)
     const firebaseConfig = {
     apiKey: "AIzaSyDBgRh-t6pJOEZfQanb-T6KYNj_XbL_YP8",
     authDomain: "runfactor-cf724.firebaseapp.com",
@@ -50,11 +38,10 @@
     measurementId: "G-KWWWHF4NQE"
     };
 
-    // Initialize Firebase and Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Function to fetch the top 50 leaderboard entries (sorted by score descending)
+    // Function to fetch the top 50 leaderboard entries
     async function fetchLeaderboard() {
     const leaderboardRef = collection(db, "leaderboard");
     const leaderboardQuery = query(leaderboardRef, orderBy("score", "desc"), limit(50));
@@ -66,13 +53,13 @@
     return leaderboardData;
     }
 
-    // Function to update the leaderboard table in the DOM
+    // Function to update the leaderboard table
     async function updateLeaderboardTable() {
     const data = await fetchLeaderboard();
     const tableBody = document.querySelector("#leaderboard-table tbody");
-    tableBody.innerHTML = ""; // Clear existing rows
+    tableBody.innerHTML = ""; // Clear previous rows
 
-    data.forEach(entry => {
+    data.forEach((entry, index) => {
         const row = document.createElement("tr");
 
         // Username column
@@ -89,11 +76,17 @@
     });
     }
 
-    // Initial load
+    // Initial load of leaderboard data
     updateLeaderboardTable();
 
-    // Update the leaderboard every 5 minutes (300,000 milliseconds)
+    // Auto-refresh every 5 minutes (300,000 milliseconds)
     setInterval(updateLeaderboardTable, 300000);
+
+    // Manual refresh button event listener
+    const refreshButton = document.getElementById("refresh-leaderboard");
+    if (refreshButton) {
+    refreshButton.addEventListener("click", updateLeaderboardTable);
+    }
 </script>
 </body>
 </html>
