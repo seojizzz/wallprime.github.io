@@ -340,7 +340,8 @@ class PrimeFactorGame {
             ? this.wrongList.map(q => `<li title="${q.factors}">${q.number}</li>`).join('') 
             : '<li>None</li>';
         gameOver();
-    }   
+    }  
+}
 }
 
 // 6. Initialize Game Object
