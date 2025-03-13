@@ -334,6 +334,25 @@ class PrimeFactorGame {
     
 }
 
+// 6. Initialize Game Object
+document.addEventListener("DOMContentLoaded", () => {
+  const game = new PrimeFactorGame();
+  // Bind the start button directly:
+  const startGameBtn = document.getElementById("start-game-btn");
+  if (startGameBtn) {
+    startGameBtn.addEventListener("click", () => {
+      game.startGame();
+    });
+  } else {
+    console.error("Start game button not found!");
+  }
+});
+
+const game = new PrimeFactorGame();
+export function startGame() {
+    game.startGame();
+}
+
 // 5. Define Helper Functions (Leaderboard, Score Submission)
 function gameOver() {
     let username = document.getElementById("username").value;
@@ -386,9 +405,3 @@ async function submitScore(username, score) {
     }
 }
 
-// 6. Initialize Game Object
-const game = new PrimeFactorGame();
-// 7. Export startGame()
-export function startGame() {
-    game.startGame();
-}
