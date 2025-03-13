@@ -303,6 +303,7 @@ class PrimeFactorGame {
       
       // Update the display
       document.getElementById("timer-display").innerText = `Time Left: ${remaining.toFixed(2)}s`;
+    }
 
     getFactorization(number) {
       let n = number;
@@ -315,7 +316,6 @@ class PrimeFactorGame {
       }
       return Object.entries(factors).map(([base, exp]) => exp > 1 ? `${base}^${exp}` : base).join(" × ");
       }
-    }
 
     endGame() {
         // Ensure elements exist before modifying them
