@@ -1,5 +1,4 @@
-# Prime Factorization Challenge (Competitive)
-# Leaderboard is DOWN until 12th March
+# WallPrime for Pi Day @SJI
 [You can access the game here!](https://seojizzz.github.io/wallprime.github.io/)
 
 ## Objective
