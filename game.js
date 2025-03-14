@@ -434,6 +434,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
   }
   startBtn.addEventListener("click", () => {
+        const music = document.getElementById("background-music");
+        music.play().catch(error => {
+          console.error("Error playing music:", error);
+        });
       const usernameInput = document.getElementById("username-input");
       if (!usernameInput) {
           console.error("Username input element not found!");
